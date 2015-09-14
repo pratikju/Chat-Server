@@ -1,0 +1,30 @@
+{
+  "name": "chat-server",
+  "version": "1.0.0",
+  "description": "A basic chat-server",
+  "main": "server.js",
+  "dependencies": {
+    "ipaddr.js": "*",
+    "properties-reader": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js name.properties 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pratikju/Chat-Server.git"
+  },
+  "keywords": [
+    "chat",
+    "server",
+    "telnet"
+  ],
+  "author": "pratik singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pratikju/Chat-Server/issues"
+  },
+  "homepage": "https://github.com/pratikju/Chat-Server#readme"
+}
