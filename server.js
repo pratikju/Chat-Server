@@ -5,23 +5,16 @@ var properties = PropertiesReader(process.argv[2]);
 
 var sockets=[];
 var server = net.createServer(function(socket){
-	var socket_address = socket.remoteAddress
+	socket.ip_address = socket.remoteAddress
 
-	sockets.push(socket);
-	console.log("No. of connected users: "+sockets.length)
-	var data = getName_Address(socket_address) + " has joined\n";
-	broadcast_message(sockets,socket,socket_address,data,true);
+	add_nodes(socket); // add to sockets for nodes connecting to the server
 
 	socket.on('data',function(data){
-		broadcast_message(sockets,socket,socket_address,data,false);
+		broadcast_message(socket,data,false); //broadcast message to all the connected nodes
 	});
 
 	socket.on('end',function(){
-		var i = sockets.indexOf(socket);
-		sockets.splice(i,1);
-		var data = getName_Address(socket_address) + " has left\n";
-		broadcast_message(sockets,socket,socket_address,data,true);
-		console.log("No. of connected users: "+sockets.length)
+		remove_nodes(socket); // remove from sockets for nodes disconnecting from the server
 	});
 
 	socket.on('error',function(err){
@@ -30,25 +23,41 @@ var server = net.createServer(function(socket){
 	});
 });
 
-var getName_Address = function(ipv4Address){
+var getName_Address = function(ipAddress){
 	var name = "";
-	if(properties.get(ipaddr.process(ipv4Address))!=null){
-		name = properties.get(ipaddr.process(ipv4Address));
+	if(properties.get(ipaddr.process(ipAddress))!=null){
+		name = properties.get(ipaddr.process(ipAddress));
 	}else{
-		name = ipaddr.process(ipv4Address);
+		name = ipaddr.process(ipAddress);
 	}
 	return name;
 }
 
-var broadcast_message = function(sockets,socket,socket_address,data,params){
+var broadcast_message = function(socket,data,in_out_param){
 	for(i=0;i<sockets.length;i++){
 		if(sockets[i]==socket)continue;
-		if(params){
+		if(in_out_param){
 			sockets[i].write(data);
 		}else{
-			sockets[i].write(getName_Address(socket_address) +' => ' + data);
+			sockets[i].write(getName_Address(socket.ip_address) +' => ' + data);
 		}
 	}
+}
+
+var add_nodes = function(socket){
+	sockets.push(socket);
+	console.log("No. of connected users: "+sockets.length)
+	socket.write("********Welcome********\n");
+	var data = getName_Address(socket.ip_address) + " has joined\n";
+	broadcast_message(socket,data,true);
+}
+
+var remove_nodes = function(socket){
+	var i = sockets.indexOf(socket);
+	sockets.splice(i,1);
+	var data = getName_Address(socket.ip_address) + " has left\n";
+	broadcast_message(socket,data,true);
+	console.log("No. of connected users: "+sockets.length)
 }
 
 server.listen(process.argv[3]);
